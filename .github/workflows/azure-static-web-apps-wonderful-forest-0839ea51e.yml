@@ -9,7 +9,7 @@ on:
 jobs:
   build_and_deploy_job:
     env:
-      GRIDSOME_API_BACKEND_URL: https://cg2021-headless-unicore.azurewebsites.net
+      GRIDSOME_API_BACKEND_URL: https://cg2021-be.proworks.com
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
