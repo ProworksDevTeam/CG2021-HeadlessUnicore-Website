@@ -1,5 +1,5 @@
 {
-  "name": "Website",
+  "name": "cg2021-headless-unicore",
   "private": true,
   "scripts": {
     "develop": "gridsome develop",
@@ -7,6 +7,8 @@
     "build": "gridsome build"
   },
   "dependencies": {
+    "@gridsome/source-graphql": "^0.1.0",
+    "graphql-request": "^3.4.0",
     "gridsome": "^0.7.0"
   }
 }
