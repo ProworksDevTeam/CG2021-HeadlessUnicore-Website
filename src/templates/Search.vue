@@ -22,41 +22,55 @@ export default {
         };
     },
     async mounted() {
-        if (!this.$route || !this.$route.query || !this.$route.query.q || !this.$route.query.q.length) {
+        if (!this.$route || !this.$route.query) {
             this.results = [];
             return;
         }
 
-        const data = await request(this.backendUrl + '/umbraco/graphql', `
-        query ($query: String!) {
-            umbraco {
-                examine {
-                    external {
-                        search(query:$query) {
-                            results {
-                                _umbraco_key
+        await this.executeQuery(this.$route.query.q);
+    },
+    methods: {
+        async executeQuery(text) {
+            if (!text || !text.length) {
+                this.results = [];
+                return;
+            }
+
+            const data = await request(this.backendUrl + '/umbraco/graphql', `
+                query ($query: String!) {
+                    umbraco {
+                        examine {
+                            external {
+                                search(query:$query) {
+                                    results {
+                                        _umbraco_key
+                                    }
+                                }
                             }
                         }
                     }
-                }
+                }`, {query:text});
+
+            const allPages = ((this.$static || {}).allPage || []).filter(x => x && x.context && x.context._id && x.context._name);
+            let pageMap = {};
+            for (let i = 0; i < allPages.length; i++) {
+                const page = allPages[i];
+                pageMap[page.context._id] = { id: page.context._id, url: page.path, title: page.context.title || page.context._name };
             }
-        }`, {query:this.$route.query.q});
 
-        const allPages = ((this.$static || {}).allPage || []).filter(x => x && x.context && x.context._id && x.context._name);
-        let pageMap = {};
-        for (let i = 0; i < allPages.length; i++) {
-            const page = allPages[i];
-            pageMap[page.context._id] = { id: page.context._id, url: page.path, title: page.context.title || page.context._name };
+            const searchResults = (((((data || {}).umbraco || {}).examine || {}).external || {}).search || {}).results || [];
+            let results = [];
+            for (let i = 0; i < searchResults.length; i++) {
+                const page = pageMap[searchResults[i]._umbraco_key];
+                if (page) results.push(page);
+            }
+
+            this.results = results;
         }
-
-        const searchResults = (((((data || {}).umbraco || {}).examine || {}).external || {}).search || {}).results || [];
-        let results = [];
-        for (let i = 0; i < searchResults.length; i++) {
-            const page = pageMap[searchResults[i]._umbraco_key];
-            if (page) results.push(page);
-        }
-
-        this.results = results;
+    },
+    async beforeRouteUpdate(to, from, next) {
+        await this.executeQuery(to.query.q)
+        next();
     }
 }
 </script>

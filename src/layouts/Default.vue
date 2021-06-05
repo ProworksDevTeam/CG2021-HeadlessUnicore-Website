@@ -24,8 +24,8 @@
 
           <!-- Search -->
           <section v-if="searchPageUrl" id="search" class="alt">
-            <form method="get" :action="searchPageUrl">
-              <input type="text" name="q" id="q" placeholder="Search" />
+            <form @submit.prevent="search()">
+              <input type="text" name="q" id="q" placeholder="Search" v-model="searchText" />
             </form>
           </section>
 
@@ -42,7 +42,6 @@
           <!-- Footer -->
           <footer id="footer">
             <p class="copyright">&copy;{{ copyrightYear }} ProWorks. All rights reserved. Demo Images: <a href="https://unsplash.com">Unsplash</a>. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
-            <p>Generated on {{ renderDateTime }}</p>
           </footer>
 
         </div>
@@ -61,7 +60,6 @@
 export default {
   data: function() {
     return {
-      renderDateTime: new Date(),
       searchText: ''
     }
   },
@@ -76,14 +74,16 @@ export default {
       ],
       link: [
         { rel:'stylesheet', type:'text/css', href:'/assets/css/main.css' }
-      ],
-      script: [
-        { src:'/assets/js/jquery.min.js' },
-        { src:'/assets/js/browser.min.js' },
-        { src:'/assets/js/breakpoints.min.js', defer:'defer' },
-        { src:'/assets/js/util.js', defer:'defer' },
-        { src:'/assets/js/main.js', defer:'defer' }
       ]
+    }
+  },
+  methods: {
+    search: function() {
+      const url = this.searchPageUrl;
+      if (this.searchText && this.searchText.length && url && url.length)
+      {
+        this.$router.push(this.searchPageUrl + '?q=' + encodeURIComponent(this.searchText));
+      }
     }
   },
   computed: {
