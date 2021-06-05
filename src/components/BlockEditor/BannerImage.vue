@@ -1,6 +1,6 @@
 <template>
     <span class="image main" v-if="content.image && content.image._url">
-        <img :src="backendUrl + content.image._url + '?width=1920&height=1080'" :alt="content.image._name" />
+        <img :src="backendUrl + content.image._url + '?width=1600&height=400'" :alt="content.image._name" />
     </span>
 </template>
 
